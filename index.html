@@ -3,70 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>University ERP System</title>
+    <title>Resturant Point of Sale System</title>
 </head>
 <body>
-    <article>
-  <header>
-    <h1>Uttara University</h1>
-    <p>Student ERP System</p>
-    <p>profile information class routine and course name and result</p>
-  </header>
-  <p>Welcome to the official student portal of uttara university</p>
-</article>
-<h2>Student Information</h2>
-<p>Name:Purnima Akter Mim</p>
-<p>Student ID:2243081114</p>
-<p>Department:CSE</p>
-<p>Gmail:mim@.....edu.bd</p>
+    <h2>Resturant Point of Sale System</h2>
+    Customer Name:
+<input type="text" id="name" onkeyup="showName()">
+<p id="customer">Customer:</p>
+    <h3>Menu</h3>
+    <button onclick="addItem('Burger',250)">Burger-250</button>
+<button onclick="addItem('Pizza',800)">Pizza-800</button>
+<button onclick="addItem('Fried Rice',350)">Fried Rice-350</button>
+<button onclick="addItem('Coffee',120)">Coffee-120</button>
+<button onclick="addItem('Soft Drink',50)">Soft Drink-50</button
+    <h3>Order List</h3>
+    <table border="1"cellpadding="8">
+        <tr>
+            <th>Item</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Remove</th>
+        </tr>
+        <tbody id="list"></tbody>
+    </table>
+    <h3>Subtotal:<span id="sub">0</span></h3>
+    <h3>VAT(15%):<span id="vat">0</span></h3>
+    <h3>Service Charge(5%):<span id="service">0</span></h3>
+    <h3>Grand Total:<span id="grand">0</span></h3>
+    <button onclick="window.print()">Print Invoice</button>
+    <style>
+           body {
+        font-family: Arial, sans-serif;
+        background: #f0f4f8;
+        text-align: center;
+        padding: 20px;
+    }
 
-<img src="student,jpg" alt="Profile picture" width="500" height="600">
-<h2> Course Name</h2>
-   <ol>
-    <li>Web Programing</li>
-   <li>Artificial Inteligance</li>
-   <li>Financial and Managerial Acounting</li>
-   </ol>
+    h2 {
+        color: #1565c0;
+    }
 
-   <h2>Course Teachers Name</h2>
-   <ul>
-    <li>Md.Harun-Ar-Rashid</li>
-   <li>Dr.Md Ahadullah</li>
-   <li>Md.Adam Shafiulla</li>
-   </ul>
+    button {
+        background: #00897b;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        margin: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
 
-   <table border = "1">
-    <tr>
-        <th>Course Name</th>
-        <th>Course Teachers Name</th>
-        <th>Timetable of class</th>
-        
-    </tr>
-    <tr>
-        
-            <td>Web Programming</td>
-            <td>Md.Harun-Ar-Rashid</td>
-            <td><p><time>8.45am</time> to <time>11.25am</time> </p></td>
-  
-    </tr>
-    <tr>
-        <td>Artificial Intiligance</td>
-        <td>Dr.Md Ahadullah</td>
-        <td><p><time>1.15pm</time> to <time>2.35pm</time> </p></td>
-    </tr>
-    <tr>
-        <td>Financial and Managerial Acounting</td>
-        <td>Md.Adam Shafiulla</td>
-        <td><p><time>1.15pm</time> to <time>2.35pm</time> </p></td>
-    </tr>
-    
-   </table>
+    button:hover {
+        background: #00574b;
+    }
 
-    
-    
+    table {
+        margin: 15px auto;
+        width: 90%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    th {
+        background: #1565c0;
+        color: white;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
+
+    input {
+        padding: 7px;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+    }
+
+    h3, h2 {
+        margin: 15px;
+    }
+
+    #grand {
+        color: #00897b;
+        font-weight: bold;
+    }
+
+    @media print {
+        button, input {
+            display: none;
+        }
+
+        body {
+            background: white;
+        }
+    }
+    </style>
+    <script>
+let order = [];
+
+function addItem(name, price) {
+    let found = false;
+
+    for (let i = 0; i < order.length; i++) {
+        if (order[i].name === name) {
+            order[i].qty++;
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        order.push({
+            name: name,
+            price: price,
+            qty: 1
+        });
+    }
+
+    display();
+}
+
+function display() {
+    let html = "";
+    let subtotal = 0;
+
+    for (let i = 0; i < order.length; i++) {
+        let item = order[i];
+        let total = item.price * item.qty;
+        subtotal += total;
+
+        html += "<tr>";
+        html += "<td>" + item.name + "</td>";
+        html += "<td>" + item.price + "</td>";
+        html += "<td><input type='number' min='1' value='" +
+            item.qty + "' onchange='changeQty(" + i +
+            ", this.value)'></td>";
+        html += "<td>" + total + "</td>";
+        html += "<td><button onclick='removeItem(" + i +
+            ")'>Remove</button></td>";
+        html += "</tr>";
+    }
+
+    document.getElementById("list").innerHTML = html;
+
+    let vat = subtotal * 0.15;
+    let service = subtotal * 0.05;
+
+    document.getElementById("sub").innerText =
+        subtotal.toFixed(2);
+
+    document.getElementById("vat").innerText =
+        vat.toFixed(2);
+
+    document.getElementById("service").innerText =
+        service.toFixed(2);
+
+    document.getElementById("grand").innerText =
+        (subtotal + vat + service).toFixed(2);
+}
+
+function changeQty(i, qty) {
+    qty = Number(qty);
+
+    if (Number.isInteger(qty) && qty >= 1) {
+        order[i].qty = qty;
+    } else {
+        alert("Enter quantity 1 or more");
+    }
+
+    display();
+}
+
+function removeItem(i) {
+    order.splice(i, 1);
+    display();
+}
+
+function showName() {
+    document.getElementById("customer").innerText =
+        "Customer: " +
+        document.getElementById("name").value;
+}
+</script>
    
     
-
-
 </body>
 </html>
